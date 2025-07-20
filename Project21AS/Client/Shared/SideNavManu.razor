@@ -1,0 +1,122 @@
+﻿
+@using Project21AS.Client.States
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+<nav class="sidebar close">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                 <a href="/"> <img src="/Image/logo.png" alt=""> </a>
+            </span>
+
+            <div class="text logo-text">
+                <span class="name" style="font-size:16px; font-weight: 800;">DR World</span>
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="profession" style="font-size:12px;">
+                            @context.User.Identity.Name 
+                            <a href="profile" style="margin-left:2px;"> <i class="fa fa-pencil" aria-hidden="true"></i></a>
+                        </span>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <a class='bx bx-chevron-right toggle' @onclick="toggleSideManu"></a>
+    </header>
+    <hr style="margin-bottom:0" />
+
+    <div class="menu-bar">
+        <div class="menu">
+
+           @*  <li class="search-box">
+                <i class='bx bx-search icon'></i>
+                <input type="text" placeholder="Search...">
+            </li> *@
+
+            <ul class="menu-links">
+                <li class="">
+                    <a href="/">
+                        <i class='bx bx-home-alt icon' title="Home/Dashboard"></i>
+                        <span class="text nav-text">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="">
+                    <a href="students">
+                        <i class="fa fa-building-o icon" aria-hidden="true" title="Student List"></i>
+                        <span class="text nav-text">Student List</span>
+                    </a>
+                </li>
+
+                <li class="">
+                    <a href="batches">
+                        <i class="fa fa-users icon" aria-hidden="true" title="Batch List"></i>
+                        <span class="text nav-text">Batch  List</span>
+                    </a>
+                </li>
+
+                <li class="">
+                    <a href="Downloads/Mantra_MSF100_Drivers.zip">
+                        <i class='bx bx-download icon' title="Download"></i>
+                        <span class="text nav-text">Mantra Driver</span>
+                    </a>
+                </li>
+                
+                <AuthorizeView Roles="SuperAdmin,Admin">
+                    <li class="">
+                        <a href="admin-controls">
+                            <i class="fa fa-lock icon" aria-hidden="true" title="Admin Control"></i>
+                            <span class="text nav-text">Admin Control</span>
+                        </a>
+                    </li>
+                </AuthorizeView>
+            </ul>
+        </div>
+
+        <div class="bottom-content">
+            <li class="">
+                <a @onclick="LogoutClick" style="cursor:pointer">
+                    <i class='bx bx-log-out icon' title="Logout"></i>
+                    <span class="text nav-text">Logout</span>
+                </a>
+            </li>
+
+            <li class="mode">
+                <div class="sun-moon">
+                    <i class='bx bx-moon icon moon'></i>
+                    <i class='bx bx-sun icon sun'></i>
+                </div>
+                <span class="mode-text text">Dark mode</span>
+
+                <a class="toggle-switch" @onclick="toggleLightDarkMode">
+                    <span class="switch"></span>
+                </a>
+            </li>
+
+        </div>
+    </div>
+
+</nav>
+
+
+
+@code {
+
+    async Task LogoutClick()
+    {
+        await authStateProvider.Logout();
+        navigationManager.NavigateTo("/login");
+    }
+    async Task toggleSideManu()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleSideManu");
+    } 
+    
+    async Task toggleLightDarkMode()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleLightDarkMode");
+    }
+}

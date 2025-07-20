@@ -1,0 +1,80 @@
+﻿@page "/register"
+@layout LoginLayout
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+@using Project21AS.Dto.Auth
+@* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
+
+<PageTitle>Register</PageTitle>
+
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h2 text-center">Create Account</h1>
+                </div>
+                <div class="card-body">
+                    <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-floating mb-3">
+                            <InputText id="inputUsername" class="form-control" @bind-Value="registerParameters.UserName" autofocus placeholder="Username" />
+                            <label for="inputUsername">User Name</label>
+                            <ValidationMessage For="@(() => registerParameters.UserName)" />
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <InputText id="inputUserEmail" class="form-control" @bind-Value="registerParameters.Email" autofocus placeholder="Email" />
+                            <label for="inputUserEmail">User Email</label>
+                            <ValidationMessage For="@(() => registerParameters.Email)" />
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="registerParameters.Password" />
+                            <label for="inputPassword">Password</label>
+                            <ValidationMessage For="@(() => registerParameters.Password)" />
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="registerParameters.PasswordConfirm" />
+                            <label for="inputPasswordConfirm">Password Confirmation</label>
+                            <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
+                        </div>      
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+                        </div>
+
+                        <label class="text-danger">@error</label>
+
+                        <NavLink href="login">
+                            <h6 class="font-weight-normal text-center">Already have an account? Click here to login</h6>
+                        </NavLink>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    RegisterParameters registerParameters { get; set; } = new RegisterParameters();
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        try
+        {
+            await authStateProvider.Register(registerParameters);
+            navigationManager.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

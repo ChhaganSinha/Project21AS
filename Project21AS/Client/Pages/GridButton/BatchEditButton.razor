@@ -1,0 +1,23 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using Project21AS.Client.Client
+@using Project21AS.Client.Shared.Popup
+@implements ICustomGridComponent<Batch>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+
+@code {
+    [Parameter]
+    public Batch Item { get; set; }
+
+    [Parameter]
+    public CGrid<Batch> Grid { get; set; }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo($"/batch-add/{Item.Id}");
+    }
+}

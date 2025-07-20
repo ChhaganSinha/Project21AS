@@ -1,0 +1,66 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Project21AS.Client.Shared.Popup
+@using Microsoft.Extensions.Primitives
+@using Project21AS.Client.Client
+@implements ICustomGridComponent<Batch>
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime;
+@inject AppClient client
+
+@* <button class='btn btn-sm btn-success' style="border-radius:15px" @onclick="MyClickHandler" title="Download as pdf"><i class="fa fa-download"></i></button> *@
+
+<button class='btn btn-sm btn-success' style="border-radius:15px" @onclick="MyClickHandler" title="Download as pdf">
+    @if (loading)
+    {
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="sr-only">...</span>
+        </div>
+    }
+    else
+    {
+        <i class="fa fa-download"></i>
+    }
+</button>
+
+
+@code {
+    [Parameter]
+    public Batch Item { get; set; }
+
+    [Parameter]
+    public CGrid<Batch> Grid { get; set; }
+
+    bool loading = false;
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        await DownloadPDF(Item);
+    }
+
+    private async Task DownloadPDF(Batch batch)
+    {
+        try
+        {
+            loading = true;
+            string base64String = await client.PrintPDF(Item);
+            if (!string.IsNullOrEmpty(base64String))
+            {
+                await JSRuntime.InvokeVoidAsync("downloadFile", $"{batch.Name}-{batch.Admin}-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.pdf", base64String);
+                loading = false;
+            }
+            else
+            {
+                Console.WriteLine("Failed to retrieve PDF content..");
+            }
+            loading = false;
+        }
+        catch (Exception ex)
+        {
+            loading = false;
+            throw;
+        }
+    }
+}

@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <main>
+            <SideNavManu/>
+                <article class="content px-4 home">
+                    @Body
+                </article>
+            </main>
+        </Authorized>
+        <NotAuthorized>
+            @Body
+        </NotAuthorized>
+    </AuthorizeView>
+</div>

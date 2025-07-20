@@ -1,0 +1,146 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Project21AS.Client.Client
+@using Project21AS.Client.Shared.Popup
+@using Microsoft.Extensions.Primitives
+@inject AppClient client
+@implements ICustomGridComponent<Student>
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Move student to other batch"><i class="fa fa-google-wallet" aria-hidden="true"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+        <div class="col-auto" style=" width:100%; text-align:center; line-height:0px; margin-top: 2px;">
+            <UiAlert Model="alert"></UiAlert>
+        </div>
+        <EditForm Model="model" OnInvalidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator/>
+            <div>
+                <div class="form-group row p-1">
+                    <label class="col-form-label col-md-3 bold-font">Student Name</label>
+                    <div class="col-md-9">
+                        <InputText id="address" @bind-Value="model.Name" class="form-control" disabled />
+                        <ValidationMessage For="() => model.Name" />
+                    </div>
+                </div>
+                <div class="form-group row p-1">
+                    <label class="col-form-label col-md-3 bold-font">Current Batch</label>
+                    <div class="col-md-9">
+                        <InputText id="address" @bind-Value="model.CurrentBatch" class="form-control" disabled />
+                    </div>
+                </div>
+                <div class="form-group row p-1">
+                    <label class="col-form-label col-md-3 bold-font required-field">Batch</label>
+                    <div class="col-md-9">
+                        <InputSelect @bind-Value="model.NewBatch" class="form-control">
+                            <option> - Select - </option>
+                            @foreach (var batch in Batches.ToList())
+                            {
+                                if (batch.Name != Item.Batch)
+                                {
+                                    <option value="@batch.Name+@batch.Admin">@batch.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => model.NewBatch" />
+                    </div>
+                </div>
+                <hr />
+                <div style="text-align:center;">
+                    <button type="submit" class="btn btn-outline-primary btn-sm" @onclick="OnValidSubmit">Transfer</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+
+</PageDialog>
+@code {
+    [Parameter]
+    public Student Item { get; set; }
+
+    [Parameter]
+    public CGrid<Student> Grid { get; set; }
+
+    [Parameter]
+    public IList<Action<object>> Actions { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 3000;
+
+    string BatchName = string.Empty;
+
+    private bool show = false;
+    string Title = string.Empty;
+    string MessageBody = "Thank you!";
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+    bool Loading = false;
+    static bool filter = true;
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        Title = "Student Batch Transfer";
+        show = true;
+        BatchName = Item.Name;
+
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+        Actions[0]?.Invoke(Item);
+    }
+
+    List<Batch> Batches = new();
+    StudentBatchTransfer model = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert ??= new AlertModel();
+
+        model.Id = Item.Id;
+        model.Name = Item.Name;
+        model.CurrentBatch = Item.Batch;
+        Batches = (await client.GetAllBatch()).ToList();
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        alert?.Clear();
+        try
+        {
+            if (string.IsNullOrEmpty(model.NewBatch))
+                return;
+
+            var res = await client.StudentBatchTransfer(model);
+            if (res.IsSuccess)
+            { alert?.SetSuccess(res.Message); /* model = new(); */ }
+            else
+                alert?.SetError(res.Message);
+
+            
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        }
+        catch(Exception ex)
+        {
+            
+        }  
+
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+}

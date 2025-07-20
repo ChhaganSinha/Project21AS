@@ -1,0 +1,55 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Project21AS.Client.Shared.Popup
+@using Microsoft.Extensions.Primitives
+@implements ICustomGridComponent<Batch>
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="View"><i class="fa fa-eye"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+        <div style="overflow-y: auto; max-height: 450px; overflow-x:hidden;">
+            <Project21AS.Client.Pages.Student.StudentBatchWiseFilter BatchName="@BatchName" />
+        </div>
+    }
+
+</PageDialog>
+@code {
+    [Parameter]
+    public Batch Item { get; set; }
+
+    [Parameter]
+    public CGrid<Batch> Grid { get; set; }
+
+    [Parameter]
+    public int StudentCount { get; set; }
+
+
+    string BatchName = string.Empty;
+
+    private bool show = false;
+    string Title = string.Empty;
+    string MessageBody = "Thank you!";
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+    bool Loading = false;
+    static bool filter = true;
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        Title = Item.Name + " Batch Students";
+        show = true;
+        BatchName = Item.Name;
+        //NavigationManager.NavigateTo($"/Batch-view/{Item.Id}");
+
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+    }
+}

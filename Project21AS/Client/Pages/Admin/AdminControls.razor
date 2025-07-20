@@ -1,0 +1,297 @@
+﻿@page "/admin-controls"
+@using Project21AS.Dto.Auth
+@using Project21AS.Client.Shared.Popup
+@using Project21AS.Client.Pages.Admin
+@inject IdentityAuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager
+@inject IAuthorizeApi authorizeApi
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+
+@if (users == null)
+{
+    <div style="margin-top:40vh">
+        <div class="loading-bar"></div>
+    </div>
+}
+else if (users.Count == 0)
+{
+    <p>No users found.</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-header bg-secondary text-center text-white">
+            @Title
+        </div>
+        <div class="card-body">
+
+
+            <div class="bt-wizard">
+                <ul class="nav nav-pills">
+                    @if (Tab == 1)
+                    {
+                        <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Manage Roles</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Add User</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Password</a></li>
+                    }
+                    @if (Tab == 2)
+                    {
+                        <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Roles</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Add User</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Password</a></li>
+                    }
+                    @if (Tab == 3)
+                    {
+                        <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Roles</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Add User</a></li>
+                        <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Manage Password</a></li>
+                    }
+                </ul>
+                <div class="tab-content card">
+                    <div class="pt-1 bg-primary"></div>
+                    @if (Tab == 1)
+                    {
+                        <div class="tab-pane card-body pt-4 active show p-2">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Current Role</th>
+                                            <th style="min-width: 115px;">Update Role</th>
+                                            <th>IsActive</th>
+                                            <th>Allowed Batches</th>
+                                            <th>Student/Batch</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in users)
+                                        {
+                                            <tr>
+                                                <td>@user.UserName</td>
+                                                <td>@user.Email</td>
+                                                <td>@user.Role</td>
+                                                <td>
+                                                    <select @bind="user.Role" class="form-control">
+                                                        @foreach (var role in Roles)
+                                                        {
+                                                            <option value="@role">@role</option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    <InputCheckbox disabled="@(user.Role == "Admin")" @bind-Value="user.IsActive" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" @bind="user.AllowedBatches" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" @bind="user.MaxStudentPerBatch" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <button class="btn text-success" title="Update" @onclick="() => UpdateUserRole(user)" style="background-color:transparent; border:none;">
+                                                        <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    @if (Tab == 2)
+                    {
+                        <div class="tab-pane card-body pt-4 active show p-2">
+                            <div class="container">
+                                <div class="row justify-content-md-center">
+                                    <div class="col-sm-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4 class="text-center">Create Account</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+                                                    <DataAnnotationsValidator />
+
+                                                    <div class="form-floating mb-3">
+                                                        <InputText id="inputUsername" class="form-control" @bind-Value="registerParameters.UserName" autofocus placeholder="Username" />
+                                                        <label for="inputUsername">User Name</label>
+                                                        <ValidationMessage For="@(() => registerParameters.UserName)" />
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        <InputText id="inputUserEmail" class="form-control" @bind-Value="registerParameters.Email" autofocus placeholder="Email" />
+                                                        <label for="inputUserEmail">User Email</label>
+                                                        <ValidationMessage For="@(() => registerParameters.Email)" />
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="registerParameters.Password" />
+                                                        <label for="inputPassword">Password</label>
+                                                        <ValidationMessage For="@(() => registerParameters.Password)" />
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="registerParameters.PasswordConfirm" />
+                                                        <label for="inputPasswordConfirm">Password Confirmation</label>
+                                                        <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
+                                                    </div>
+
+                                                    <!-- New fields for AllowedBatches and IsActive -->
+                                                    <div class="form-floating mb-3">
+                                                        <InputNumber id="inputAllowedBatches" class="form-control" @bind-Value="registerParameters.AllowedBatches" placeholder="Allowed Batches" />
+                                                        <label for="inputAllowedBatches">Allowed Batches</label>
+                                                        <!-- You can customize the validation message if needed -->
+                                                    </div>
+
+                                                    <!-- New fields for AllowedBatches and IsActive -->
+                                                    <div class="form-floating mb-3">
+                                                        <InputNumber id="MaxStudentPerBatch" class="form-control" @bind-Value="registerParameters.MaxStudentPerBatch" placeholder="Allowed Batches" />
+                                                        <label for="MaxStudentPerBatch">Student Per Batch</label>
+                                                        <!-- You can customize the validation message if needed -->
+                                                    </div>
+
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="inputIsActive" @bind="registerParameters.IsActive" />
+                                                        <label class="form-check-label" for="inputIsActive">Is Active</label>
+                                                    </div>
+
+                                                    <div class="d-grid gap-2">
+                                                        <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+                                                    </div>
+
+                                                    <label class="text-danger">@error</label>
+                                                </EditForm>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Tab == 3)
+                    {
+                        <div class="tab-pane card-body pt-4 active show p-2">
+                            <div class="container">
+                                <div class="row justify-content-md-center">
+                                    <div class="col-sm-6">
+                                        <div class="card">
+                                            <i class="text-warning bg-secondary" style="text-align:center">You can change password of any user from here</i>
+                                          <ChangeUserPasswordByAdmin/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+
+
+
+
+
+            <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+                @if (show)
+                {
+                    @if (TaskCompleted)
+                    {
+                        <div style="text-align:center;">
+                            @MessageBody
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="text-align:center">
+                            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                        </div>
+                    }
+                }
+            </Dailog>
+
+        </div>
+    </div>
+}
+
+@code {
+    private List<UserViewModel> users;
+    private List<string> Roles;
+    string Title = "Admin Control Panel";
+    private bool show = false;
+    string Message = string.Empty;
+    string MessageBody = "Thank you!";
+    bool TaskCompleted = false;
+    int Tab = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await authorizeApi.GetUsers();
+        Roles = await authStateProvider.GetRoles();
+    }
+
+    private async Task UpdateUserRole(UserViewModel user)
+    {
+
+        try
+        {
+            Message = string.Empty;
+            MessageBody = "Thank you!";
+            show = true;
+            TaskCompleted = false;
+            Message = "Please wait";
+            await authorizeApi.UpdateUserRole(user);
+            Message = "Successfully Updated";
+            TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Message = "Error";
+            Message = ex.Message;
+            TaskCompleted = true;
+        }
+    }
+
+
+    RegisterParameters registerParameters { get; set; } = new RegisterParameters();
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        Message = string.Empty;
+        MessageBody = "Thank you!";
+        show = true;
+        TaskCompleted = false;
+        try
+        {
+            Message = "Please wait";
+            await authorizeApi.Register(registerParameters);
+            Message = "Successfully Registered";
+            TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Message = "Error";
+            Message = ex.Message;
+            TaskCompleted = true;
+        }
+
+    }
+    private async void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Registered"))
+        {
+            registerParameters = new();
+        }
+        users = await authorizeApi.GetUsers();
+        StateHasChanged();
+    }
+
+}

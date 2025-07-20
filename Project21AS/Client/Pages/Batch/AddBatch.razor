@@ -1,0 +1,179 @@
+﻿@page "/batch-add"
+@page "/batch-add/{Id:int}"
+@using Project21AS.Client.Client
+@using Project21AS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HttpClient _httpClient
+
+<div>
+    <div class="card">
+        <div class="card-header bg-secondary text-center text-white">
+            @Title
+        </div>
+        <div class="card-body">
+            @if (model == null && !TaskCompleted)
+            {
+                <div class="col-sm-12" style="margin-top:45vh; background-color: transparent;">
+                    <div class="card-header">
+                        <div class="loading-bar"></div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    @*<ValidationSummary />*@
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-2 bold-font required-field">Batch Name</label>
+                        <div class="col-md-10">
+                            <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                            <ValidationMessage For="() => model.Name" />
+                        </div>
+
+                       @*  <label class="col-form-label col-md-2 bold-font">Admin</label>
+                        <div class="col-md-4">
+                            <InputText id="admin" @bind-Value="model.Admin" class="form-control" />
+                            <ValidationMessage For="() => model.Admin" />
+                        </div> *@
+                    </div>
+
+                   @*  <div class="form-group row mb-4">
+                        <label class="col-form-label col-md-2 bold-font required-field">Username</label>
+                        <div class="col-md-4">
+                            <InputText id="address" @bind-Value="model.Username" class="form-control" />
+                            <ValidationMessage For="() => model.Username" />
+                        </div>
+
+                        
+                    </div> *@
+                    <hr/>
+                    <div style="text-align:center;" class="mt-0">
+                        <button type="submit" class="btn btn-success col-md-2">Submit</button>
+                        <button type="button" class="btn btn-danger col-md-2" @onclick="OnClose">Close</button>
+                    </div>
+                    <br />
+                </EditForm>
+                <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+                    @if (show)
+                    {
+                        @if (TaskCompleted)
+                        {
+                            <div style="text-align:center;">
+                                @MessageBody
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="text-align:center">
+                                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                            </div>
+                        }
+                    }
+
+                </Dailog>
+            }
+        </div>
+    </div>
+
+
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Batch" : "Add Batch";
+        }
+    }
+
+    private bool show = false;
+    string Message = string.Empty;
+    string MessageBody = "Thank you!";
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+    Batch model = new();
+
+
+    public void Init()
+    {
+        Batch model = new();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            model = await client.GetBatchById(Id);
+        }
+        else
+        {
+            Init();
+        }
+    }
+    AuthenticationState authState;
+    protected async Task OnValidSubmit()
+    {
+        Message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        try
+        {
+            Message = "Please wait";
+            int Id = model.Id;
+            authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if(model.Id == 0)
+                model.Admin = authState?.User?.Identity?.Name;
+
+            model.Status = BatchStatus.Enable;
+            var response = await client.UpsertBatchAsync(model);
+            if (response.IsSuccess)
+            {
+                model = response.Result;
+                Message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+                TaskCompleted = true;
+            }
+            else
+            {
+                Message = "Error!";
+                MessageBody = response.Message;
+                TaskCompleted = true;
+            }
+            
+
+        }
+        catch (Exception ex)
+        {
+            //logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            Message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
+        }
+    }
+    private void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Added"))
+        {
+            model = new();
+        }
+    }
+    public void OnClose()
+    {
+        NavigationManager.NavigateTo("/batches");
+    }
+
+
+
+}

@@ -1,0 +1,81 @@
+﻿@using GridBlazor
+@using GridBlazor.Pages
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using Project21AS.Client.Pages.GridButton
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <GridComponent @ref="Component" T="Batch" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loading-bar"></div>
+        @* <span class="loader"></span> *@
+    </div>
+}
+
+@code
+{
+    private CGrid<Batch> _grid;
+    private Task _task;
+    private static GridComponent<Batch> Component;
+    static bool filter = true;
+    static AuthenticationState authState;
+
+    Action<IGridColumnCollection<Batch>> columns = c =>
+    {
+   
+        // c.Add(o => o.Id).SetWidth("5px").Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.Name).SetWidth("40%").Css("table-bordered").Titled("Batch Name").Filterable(filter);
+        c.Add(o => o.Admin).SetWidth("40%").Css("table-bordered").Titled("Batch Admin").Filterable(filter);
+        c.Add(o => o.StudentCount).Css("table-bordered").Titled("Student Count").Filterable(filter);
+
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BatchView>().SetWidth("1px").Titled("View");
+        if (string.Equals(authState?.User?.Identity?.Name, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BatchViewPdfDownloadButton>().SetWidth("1px").Titled("Pdf");
+        }
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BatchEditButton>().SetWidth("1px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BatchDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        string url = $"odata/batch";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<Batch>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+            .Sortable(true)
+            .Filterable(true)
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .SetExcelExport(true, true, "Batch")
+            .ChangePageSize(true)
+            .EmptyText("No data available")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+    public static async void RefreshGrid(object item)
+    {
+        await Component.UpdateGrid();
+    }
+}

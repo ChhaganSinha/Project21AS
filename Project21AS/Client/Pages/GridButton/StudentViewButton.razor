@@ -1,0 +1,22 @@
+﻿
+@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@implements ICustomGridComponent<Student>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="View"><i class="fa fa-eye"></i></button>
+
+@code {
+    [Parameter]
+    public Student Item { get; set; }
+
+    [Parameter]
+    public CGrid<Student> Grid { get; set; }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo($"/student-view/{Item.Id}");
+    }
+}

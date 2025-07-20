@@ -1,0 +1,218 @@
+﻿@using GridBlazor
+@using GridBlazor.Pages
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using Project21AS.Client.Pages.GridButton
+@using Project21AS.Client.Client;
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AppClient _appClient
+
+<style>
+    .grid-table{
+        font-size : 10px !important;
+    }
+
+    .table.grid-table .grid-header > .grid-header-group > .grid-header-title > button {
+        font-size:12px !important;
+    }
+
+    .table.grid-table .grid-header > .grid-header-group > .grid-header-title {
+        margin-right: 5px !important;
+        font-size : 12px !important;
+    }
+
+    .grid-change-page-size-input{
+        margin:0;
+        padding:0;
+        padding-left:10px;
+    }
+
+    .grid-goto-page-input{
+        margin: 0;
+        padding: 0;
+        padding-left: 10px;
+    }
+</style>
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12" style="margin-top:-20px">
+            <GridComponent T="Student" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+
+    <div style="text-align:center">
+        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
+
+}
+
+@code
+{
+    [Parameter] public string BatchName { get; set; } = string.Empty;
+    private CGrid<Student> _grid;
+    private Task _task;
+    static bool filter = false;
+    static string BaseUri = string.Empty;
+    static List<StudentFingerPrintMapping> studentFingerPrintMapping = new();
+
+    Action<IGridColumnCollection<Student>> columns = c =>
+    {
+        c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Batch).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Mobile).Css("table-bordered").Filterable(filter);
+        //c.Add(o => o.CreatedOn).Css("table-bordered").Format("{0:dd/MM/yyyy}").Filterable(filter);
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+       {
+           var imageUrl = "/Image/fingerprint-Icon.png";
+           var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+           if (file != null && file.FingerPrint1 != "")
+           {
+               imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint1.Replace(".txt", ".png")}";
+           }
+           return $"<img src='{imageUrl}' alt='FingerPrint1' width='50' height='50' />";
+       }).SetWidth("50px").Css("table-bordered").Titled("Finger1");
+
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint2 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint2.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='FingerPrint2' width='50' height='50' />";
+        }).SetWidth("50px").Css("table-bordered").Titled("Finger2");
+
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint3 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint3.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='FingerPrint3' width='50' height='50' />";
+        }).SetWidth("50px").Css("table-bordered").Titled("Finger3");
+
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint4 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint4.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='FingerPrint4' width='50' height='50' />";
+        }).SetWidth("50px").Css("table-bordered").Titled("Finger4");
+
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint5 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint5.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='FingerPrint5' width='50' height='50' />";
+        }).SetWidth("50px").Css("table-bordered").Titled("Finger5");
+
+        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        // {
+        //     var imageUrl = "/Image/fingerprint-Icon.png";
+        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+        //     if (file != null && file.FingerPrint6 != "")
+        //     {
+        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint6.Replace(".txt", ".png")}";
+        //     }
+        //     return $"<img src='{imageUrl}' alt='FingerPrint6' width='50' height='50' />";
+        // }).SetWidth("50px").Css("table-bordered").Titled("Finger6");
+
+        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        // {
+        //     var imageUrl = "/Image/fingerprint-Icon.png";
+        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+        //     if (file != null && file.FingerPrint7 != "")
+        //     {
+        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint7.Replace(".txt", ".png")}";
+        //     }
+        //     return $"<img src='{imageUrl}' alt='FingerPrint7' width='50' height='50' />";
+        // }).SetWidth("50px").Css("table-bordered").Titled("Finger7");
+
+        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        // {
+        //     var imageUrl = "/Image/fingerprint-Icon.png";
+        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+        //     if (file != null && file.FingerPrint8 != "")
+        //     {
+        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint8.Replace(".txt", ".png")}";
+        //     }
+        //     return $"<img src='{imageUrl}' alt='FingerPrint8' width='50' height='50' />";
+        // }).SetWidth("50px").Css("table-bordered").Titled("Finger8");
+
+        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        // {
+        //     var imageUrl = "/Image/fingerprint-Icon.png";
+        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+        //     if (file != null && file.FingerPrint9 != "")
+        //     {
+        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint9.Replace(".txt", ".png")}";
+        //     }
+        //     return $"<img src='{imageUrl}' alt='FingerPrint9' width='50' height='50' />";
+        // }).SetWidth("50px").Css("table-bordered").Titled("Finger9");
+
+        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        // {
+        //     var imageUrl = "/Image/fingerprint-Icon.png";
+        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+        //     if (file != null && file.FingerPrint10 != "")
+        //     {
+        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint10.Replace(".txt", ".png")}";
+        //     }
+        //     return $"<img src='{imageUrl}' alt='FingerPrint10' width='50' height='50' />";
+        // }).SetWidth("50px").Css("table-bordered").Titled("Finger10");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        BaseUri = NavigationManager.BaseUri;
+        string url = $"odata/Student";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-filter", $"Batch__1__{BatchName}");
+
+        ////filterType: string for the selected filter type.It can be one of these characters:
+        // 1: Equals
+        // 2: Contains
+        // 3: StartsWith
+        // 4: EndsWidth
+        // 5: GreaterThan
+        // 6: LessThan
+        // 7: GreaterThanOrEquals
+        // 8: LessThanOrEquals
+
+        var client = new GridODataClient<Student>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+            .Sortable(true)
+            .Filterable(true)
+            .ClearFiltersButton(false)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .SetExcelExport(false, true, "Students.xlsx")
+            .ChangePageSize(true)
+            .EmptyText("No data available")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+        studentFingerPrintMapping = new List<StudentFingerPrintMapping>(await _appClient.GetAllStudentFingerPrintMapping());
+    }
+
+
+}

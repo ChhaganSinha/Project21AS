@@ -1,0 +1,77 @@
+﻿@page "/"
+@using Project21AS.Client.Client
+@inject AppClient client
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+
+<div>
+    <div class="row">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-building-o icon" aria-hidden="true"></i>
+                    Total Batches <i style="float:right; color:black; font-size:20px; font-weight:600">@TotalBatches</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="batches">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-building-o icon" aria-hidden="true"></i>
+                    Total Students <i style="float:right; color:black; font-size:20px; font-weight:600">@TotalStudents</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="students">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-building-o icon" aria-hidden="true"></i>
+                    Remaining Batches <i style="float:right; color:black; font-size:20px; font-weight:600">@RemainingBatches</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="batches">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-secondary text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-building-o icon" aria-hidden="true"></i>
+                    Others <i style="float:right; color:black; font-size:20px; font-weight:600">@Others</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="companies">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+    int TotalBatches = 0;
+    int TotalStudents = 0;
+    int RemainingBatches = 0;
+    int Others = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await client.GetDashboardStatistics();
+        TotalBatches = data.TotalBatches;
+        TotalStudents = data.TotalStudent;
+    }
+
+    
+}                    
