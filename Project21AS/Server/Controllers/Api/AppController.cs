@@ -11,6 +11,7 @@ using Project21AS.Dto;
 using Project21AS.Dto.Dashboard;
 using Project21AS.Repositories;
 using System.Net.Http;
+using System.IO;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
@@ -188,15 +189,23 @@ namespace Project21AS.Server.Controllers.Api
                 //var BaseUri = new Uri($"{Request.Scheme}://{Request.Host}/");
                 var BaseUri = _configuration["BaseUrl"];
 
+                string studentZonePath;
+#if DEBUG
+                studentZonePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\Project21AS\\Client\\wwwroot\\StudentZone";
+#else
+                studentZonePath = Path.Combine(_env.ContentRootPath, "wwwroot", "StudentZone");
+#endif
+
                 var studentListTask = GetStudentsByBatchName(batch);
                 var fingerPrintMappingTask = GetAllStudentFingerPrintMapping();
 
-                // Await the tasks to get the actual data
-                var studentList = await studentListTask;
-                var fingerPrintMapping = await fingerPrintMappingTask;
+                await Task.WhenAll(studentListTask, fingerPrintMappingTask);
+
+                var studentList = studentListTask.Result;
+                var fingerPrintMapping = fingerPrintMappingTask.Result;
 
                 // Create a temporary file path
-                var filePath = Path.GetTempFileName();
+                var filePath = Path.Combine(Path.GetTempPath(), $"example_{Guid.NewGuid()}.pdf");
 
                 // Create a PdfWriter object
                 using (var writer = new PdfWriter(filePath))
@@ -247,24 +256,33 @@ namespace Project21AS.Server.Controllers.Api
                                     // Iterate through each finger print
                                     for (int i = 1; i <= 5; i++)
                                     {
-
                                         string fingerPrintFileName = $"FingerPrint{i}";
-                                        string fingerPrintFilePath = $"{BaseUri}StudentZone/{studentFingerPrints.GetType().GetProperty(fingerPrintFileName)?.GetValue(studentFingerPrints)}";
-
-                                        // Check if the file exists
-                                        if (fingerPrintFilePath.EndsWith(".txt"))
+                                        var value = studentFingerPrints.GetType().GetProperty(fingerPrintFileName)?.GetValue(studentFingerPrints)?.ToString();
+                                        if (!string.IsNullOrWhiteSpace(value))
                                         {
-                                            ImageData imageData = ImageDataFactory.Create(fingerPrintFilePath.Replace(".txt", ".png"));
-                                            Image image = new Image(imageData);
-                                            // Set image width and height
-                                            image.SetWidth(40f); // Set width to 50 points (1 point = 1/72 inch)
-                                            image.SetHeight(40f); // Set height to 50 points
-
-                                            table.AddCell(new Cell().Add(image));
+                                            var imagePath = Path.Combine(studentZonePath, value.Replace(".txt", ".png"));
+                                            if (System.IO.File.Exists(imagePath))
+                                            {
+                                                try
+                                                {
+                                                    ImageData imageData = ImageDataFactory.Create(imagePath);
+                                                    Image image = new Image(imageData);
+                                                    image.SetWidth(40f);
+                                                    image.SetHeight(40f);
+                                                    table.AddCell(new Cell().Add(image));
+                                                }
+                                                catch
+                                                {
+                                                    table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
+                                                }
+                                            }
+                                            else
+                                            {
+                                                table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
+                                            }
                                         }
                                         else
                                         {
-                                            // Add an empty cell if the file doesn't exist
                                             table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
                                         }
                                     }
