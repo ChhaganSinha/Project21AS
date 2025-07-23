@@ -21,3 +21,7 @@ function toggleLightDarkMode() {
     }
 }
 
+function toggleDriverMenu() {
+    document.getElementById('driverSubMenu').classList.toggle('show');
+}
+

@@ -58,11 +58,24 @@
                     </a>
                 </li>
 
-                <li class="">
-                    <a href="Downloads/Mantra_MSF100_Drivers.zip">
+                <li class="submenu">
+                    <div class="menu-link" @onclick="toggleDriverMenu">
                         <i class='bx bx-download icon' title="Download"></i>
-                        <span class="text nav-text">Mantra Driver</span>
-                    </a>
+                        <span class="text nav-text">Drivers</span>
+                        <i class='bx bx-chevron-down arrow'></i>
+                    </div>
+                    <ul id="driverSubMenu" class="sub-menu">
+                        <li>
+                            <a href="Downloads/Mantra_MSF100_Drivers.zip">
+                                <span class="text nav-text">MSF100</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Downloads/MF220U_Drivers.zip">
+                                <span class="text nav-text">MF220U</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 
                 <AuthorizeView Roles="SuperAdmin,Admin">
@@ -113,7 +126,12 @@
     async Task toggleSideManu()
     {
         await JSRuntime.InvokeVoidAsync("toggleSideManu");
-    } 
+    }
+
+    async Task toggleDriverMenu()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleDriverMenu");
+    }
     
     async Task toggleLightDarkMode()
     {
