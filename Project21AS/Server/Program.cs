@@ -32,6 +32,9 @@ builder.Services.AddControllers()
 
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+
+var selectedSensor = builder.Configuration.GetValue<string>("FingerprintSensor")?.ToUpperInvariant() ?? "MFS100";
 
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 var sqlLiteAssetAuthConn = builder.Configuration.GetValue<string>("SqlLiteAuthConnectionString");
@@ -173,6 +176,10 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+if (selectedSensor == "FM220U")
+{
+    app.UseMiddleware<Project21AS.Server.Middleware.Fm220Middleware>();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
