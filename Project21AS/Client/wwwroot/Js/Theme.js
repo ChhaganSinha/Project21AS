@@ -157,33 +157,33 @@ document.addEventListener('click', function (event) {
     }
 });
 
-// Add hover effects for closed sidebar
-document.addEventListener('mouseenter', function (event) {
-    const target = event.target;
-    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
-        const submenu = target.closest('.submenu');
-        const subMenu = submenu.querySelector('.sub-menu');
+//// Add hover effects for closed sidebar
+//document.addEventListener('mouseenter', function (event) {
+//    const target = event.target;
+//    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
+//        const submenu = target.closest('.submenu');
+//        const subMenu = submenu.querySelector('.sub-menu');
 
-        if (subMenu && window.innerWidth > 768) {
-            subMenu.style.display = 'block';
-            subMenu.style.opacity = '1';
-        }
-    }
-}, true);
+//        if (subMenu && window.innerWidth > 768) {
+//            subMenu.style.display = 'block';
+//            subMenu.style.opacity = '1';
+//        }
+//    }
+//}, true);
 
-document.addEventListener('mouseleave', function (event) {
-    const target = event.target;
-    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
-        const submenu = target.closest('.submenu');
-        const subMenu = submenu.querySelector('.sub-menu');
+//document.addEventListener('mouseleave', function (event) {
+//    const target = event.target;
+//    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
+//        const submenu = target.closest('.submenu');
+//        const subMenu = submenu.querySelector('.sub-menu');
 
-        if (subMenu && window.innerWidth > 768) {
-            setTimeout(() => {
-                if (!submenu.matches(':hover')) {
-                    subMenu.style.display = 'none';
-                    subMenu.style.opacity = '0';
-                }
-            }, 100);
-        }
-    }
-}, true);
+//        if (subMenu && window.innerWidth > 768) {
+//            setTimeout(() => {
+//                if (!submenu.matches(':hover')) {
+//                    subMenu.style.display = 'none';
+//                    subMenu.style.opacity = '0';
+//                }
+//            }, 100);
+//        }
+//    }
+//}, true);
