@@ -50,7 +50,7 @@
                     </a>
                 </li>
 
-                <li class="submenu @(driverMenuOpen ? "active" : "")">
+                <li id="driverMenu" class="submenu @(driverMenuOpen ? "active" : "")">
                     <div class="menu-link" @onclick="toggleDriverMenu">
                         <i class='bx bx-download icon' title="Download"></i>
                         <span class="text nav-text">Drivers</span>
@@ -71,11 +71,27 @@
                         </li>
                     </ul>
                 </li>
-                <a class="borderd has-submenu @(_settings ? "active" : "")" @onclick="() => _settings = !_settings"><i class="fa fa-cogs" style="color:#c447e3;"></i> <span>Settings</span> <i class="fa fa-chevron-right arrow"></i></a>
-                <ul class="submenu">
-                    <li><a href="gernral-settings">General</a></li>
-                    <li><a href="Security-settings">Security</a></li>
-                </ul>
+                <li id="settingsMenu" class="submenu @(settingsMenuOpen ? "active" : "")">
+                    <div class="menu-link" @onclick="toggleSettingsMenu">
+                        <i class="fa fa-cogs icon" style="color:#c447e3;"></i>
+                        <span class="text nav-text">Settings</span>
+                        <i class='bx bx-chevron-down arrow @(settingsMenuOpen ? "rotated" : "")'></i>
+                    </div>
+                    <ul class="sub-menu @(settingsMenuOpen ? "show" : "")">
+                        <li>
+                            <a href="gernral-settings">
+                                <i class='bx bx-file-blank icon'></i>
+                                <span class="text nav-text">General</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Security-settings">
+                                <i class='bx bx-file-blank icon'></i>
+                                <span class="text nav-text">Security</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <AuthorizeView Roles="SuperAdmin,Admin">
                     <li class="">
@@ -111,46 +127,11 @@
     </div>
 </nav>
 
-<style>
-    /* Submenu Styles */
-    .submenu {
-        list-style: none;
-        padding-left: 34px;
-        margin: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-in-out;
-    }
-
-        .submenu li {
-            padding: 5px 0; /* Reduced padding */
-        }
-
-        .submenu a {
-            color: #dcdcdc;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9rem; /* Reduced font size */
-            padding: 5px;
-        }
-
-        /* Adding bullets to the child menu */
-        .submenu li {
-            list-style-type: disc; /* Bullet point */
-            padding-left: 20px; /* Indentation for bullets */
-        }
-
-    /* When the submenu is active */
-    .has-submenu.active + .submenu {
-        max-height: 120px; /* Reduced max height */
-    }
-
-</style>
 
 @code {
     private bool sidebarClosed = true;
     private bool driverMenuOpen = false;
-    bool _settings = false;
+    private bool settingsMenuOpen = false;
 
     async Task LogoutClick()
     {
@@ -168,7 +149,14 @@
     async Task toggleDriverMenu()
     {
         driverMenuOpen = !driverMenuOpen;
-        await JSRuntime.InvokeVoidAsync("toggleDriverMenu");
+        await JSRuntime.InvokeVoidAsync("toggleSubMenu", "driverMenu");
+        StateHasChanged();
+    }
+
+    async Task toggleSettingsMenu()
+    {
+        settingsMenuOpen = !settingsMenuOpen;
+        await JSRuntime.InvokeVoidAsync("toggleSubMenu", "settingsMenu");
         StateHasChanged();
     }
 

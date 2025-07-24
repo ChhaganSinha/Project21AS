@@ -29,36 +29,28 @@ window.toggleSideManu = () => {
             }
         }
 
-        // Close submenu when sidebar is closed
+        // Close all submenus when sidebar is closed
         if (sidebar.classList.contains('close')) {
-            const subMenu = document.querySelector('.sub-menu');
-            const submenu = document.querySelector('.submenu');
-            const arrow = document.querySelector('.submenu .arrow');
-            if (subMenu) {
-                subMenu.classList.remove('show');
-            }
-            if (submenu) {
-                submenu.classList.remove('active');
-            }
-            if (arrow) {
-                arrow.classList.remove('rotated');
-            }
+            document.querySelectorAll('.sub-menu').forEach(m => m.classList.remove('show'));
+            document.querySelectorAll('.submenu').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.submenu .arrow').forEach(a => a.classList.remove('rotated'));
         }
     }
 };
 
-window.toggleDriverMenu = () => {
-    const submenu = document.querySelector('.submenu');
-    const subMenu = document.querySelector('.sub-menu');
-    const arrow = document.querySelector('.submenu .arrow');
+window.toggleSubMenu = (id) => {
+    const item = document.getElementById(id);
+    if (!item) return;
+    const subMenu = item.querySelector('.sub-menu');
+    const arrow = item.querySelector('.arrow');
 
-    if (submenu && subMenu) {
-        submenu.classList.toggle('active');
+    if (subMenu) {
         subMenu.classList.toggle('show');
+    }
+    item.classList.toggle('active');
 
-        if (arrow) {
-            arrow.classList.toggle('rotated');
-        }
+    if (arrow) {
+        arrow.classList.toggle('rotated');
     }
 };
 
@@ -122,38 +114,26 @@ document.addEventListener('DOMContentLoaded', function () {
 // Handle responsive behavior
 window.addEventListener('resize', function () {
     const sidebar = document.querySelector('.sidebar');
-    const subMenu = document.querySelector('.sub-menu');
-    const submenu = document.querySelector('.submenu');
 
     if (window.innerWidth <= 768) {
-        // Mobile behavior
         if (sidebar) {
             sidebar.classList.add('close');
         }
 
-        // Reset submenu for mobile
-        if (subMenu && submenu) {
-            subMenu.classList.remove('show');
-            submenu.classList.remove('show-submenu');
-        }
+        document.querySelectorAll('.sub-menu').forEach(m => m.classList.remove('show'));
+        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.submenu .arrow').forEach(a => a.classList.remove('rotated'));
     }
 });
 
 // Add click outside to close submenu on mobile
 document.addEventListener('click', function (event) {
     const sidebar = document.querySelector('.sidebar');
-    const submenu = document.querySelector('.submenu');
-    const subMenu = document.querySelector('.sub-menu');
 
     if (window.innerWidth <= 768 && sidebar && !sidebar.contains(event.target)) {
-        if (subMenu && submenu) {
-            subMenu.classList.remove('show');
-            submenu.classList.remove('active');
-            const arrow = document.querySelector('.submenu .arrow');
-            if (arrow) {
-                arrow.classList.remove('rotated');
-            }
-        }
+        document.querySelectorAll('.sub-menu').forEach(m => m.classList.remove('show'));
+        document.querySelectorAll('.submenu').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.submenu .arrow').forEach(a => a.classList.remove('rotated'));
     }
 });
 
