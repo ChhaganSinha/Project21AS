@@ -159,8 +159,9 @@ document.addEventListener('click', function (event) {
 
 // Add hover effects for closed sidebar
 document.addEventListener('mouseenter', function (event) {
-    if (event.target.closest('.sidebar.close .submenu')) {
-        const submenu = event.target.closest('.submenu');
+    const target = event.target;
+    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
+        const submenu = target.closest('.submenu');
         const subMenu = submenu.querySelector('.sub-menu');
 
         if (subMenu && window.innerWidth > 768) {
@@ -171,8 +172,9 @@ document.addEventListener('mouseenter', function (event) {
 }, true);
 
 document.addEventListener('mouseleave', function (event) {
-    if (event.target.closest('.sidebar.close .submenu')) {
-        const submenu = event.target.closest('.submenu');
+    const target = event.target;
+    if (target && typeof target.closest === 'function' && target.closest('.sidebar.close .submenu')) {
+        const submenu = target.closest('.submenu');
         const subMenu = submenu.querySelector('.sub-menu');
 
         if (subMenu && window.innerWidth > 768) {
