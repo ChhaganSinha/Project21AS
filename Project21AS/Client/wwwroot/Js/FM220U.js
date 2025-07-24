@@ -45,8 +45,16 @@ function getSerial() {
 }
 
 function CaptureFinger(quality, timeout) {
-    // quality and timeout parameters are not used in the FM220U sample
-    captureFP();
+    // quality and timeout parameters are currently ignored by the FM220U service
+    return new Promise(function (resolve, reject) {
+        callerfun('https://localhost:4443/FM220/gettmpl', function (result) {
+            if (result && result.errorCode === 0 && result.bmpBase64) {
+                resolve(result.bmpBase64);
+            } else {
+                reject('Capture failed');
+            }
+        });
+    });
 }
 
 function callerfun(url, callback) {
