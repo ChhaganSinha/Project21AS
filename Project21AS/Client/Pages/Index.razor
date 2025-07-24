@@ -1,6 +1,7 @@
 @page "/"
 @using Project21AS.Client.Client
 @using Project21AS.Client.Shared.ChartJs
+@using System.Linq
 @inject AppClient client
 @attribute [Authorize]
 
@@ -19,6 +20,18 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-building-o icon" aria-hidden="true"></i>
+                    Remaining Batches <i style="float:right; color:black; font-size:20px; font-weight:600">@RemainingBatches</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="batches">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-warning text-white mb-4">
                 <div class="card-body" style="height:7vh">
                     <i class="fa fa-building-o icon" aria-hidden="true"></i>
@@ -26,6 +39,18 @@
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
                     <a class="small text-white stretched-link" href="students">View Details</a>
+                    <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-secondary text-white mb-4">
+                <div class="card-body" style="height:7vh">
+                    <i class="fa fa-users icon" aria-hidden="true"></i>
+                    Total Users <i style="float:right; color:black; font-size:20px; font-weight:600">@TotalUsers</i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">View Details</a>
                     <div class="small text-white"><i class="fa fa-arrow-circle-o-right fa-2x" aria-hidden="true"></i></div>
                 </div>
             </div>
@@ -51,21 +76,44 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fa fa-chart-pie me-1"></i>
+                    Students Per Batch
+                </div>
+                <div class="card-body">
+                    <PieChart Id="batchpie"
+                              Type="ChartType.pie"
+                              Data="@PieData"
+                              Labels="@PieLabels"
+                              BackgroundColor="@PieColors" />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @code {
     int TotalBatches;
     int TotalStudents;
+    int RemainingBatches;
+    int TotalUsers;
 
     string[] DashboardLabels = System.Array.Empty<string>();
     List<ChartJsDataset> DashboardDatasets = new();
+
+    string[] PieLabels = System.Array.Empty<string>();
+    string[] PieData = System.Array.Empty<string>();
+    string[] PieColors = System.Array.Empty<string>();
 
     protected override async Task OnInitializedAsync()
     {
         var data = await client.GetDashboardStatistics();
         TotalBatches = data.TotalBatches;
         TotalStudents = data.TotalStudent;
+        RemainingBatches = data.RemainingBatches;
+        TotalUsers = data.TotalUsers;
 
         DashboardLabels = new[] { "Batches", "Students" };
         DashboardDatasets.Add(new ChartJsDataset
@@ -74,5 +122,13 @@
             Data = new[] { TotalBatches.ToString(), TotalStudents.ToString() },
             BackgroundColor = new[] { "#36A2EB", "#FF6384" }
         });
+
+        if (data.StudentsByBatch != null && data.StudentsByBatch.Count > 0)
+        {
+            PieLabels = data.StudentsByBatch.Select(s => s.BatchName).ToArray();
+            PieData = data.StudentsByBatch.Select(s => s.StudentCount.ToString()).ToArray();
+            var colors = new[] { "#36A2EB", "#FF6384", "#4BC0C0", "#FFCE56", "#9966FF", "#FF9F40" };
+            PieColors = Enumerable.Range(0, PieLabels.Length).Select(i => colors[i % colors.Length]).ToArray();
+        }
     }
 }

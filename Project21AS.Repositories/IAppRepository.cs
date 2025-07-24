@@ -1,4 +1,5 @@
 ﻿using Project21AS.Dto;
+using Project21AS.Dto.Dashboard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace Project21AS.Repositories
     {
         Task<Details> GetDetailsById(int id);
         Task<IEnumerable<Details>> GetAllDetails();
+        Task<Dashboard> GetDashboardStatistics(string userName);
     }
 }
