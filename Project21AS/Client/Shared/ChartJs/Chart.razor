@@ -1,6 +1,5 @@
-﻿@using AssetManagement.Client.Client;
-@using AssetManagement.Dto
-@using AssetManagement.Dto.Dashboard;
+﻿@using Project21AS.Client.Client
+@using Project21AS.Client.Shared.ChartJs
 @inject IJSRuntime JSRuntime
 @inject AppClient client
 @inject NavigationManager NavManager
@@ -16,7 +15,7 @@
     public string IndexAxis { get; set; }
 
     [Parameter]
-    public Dto.Dashboard.ChartType Type { get; set; }
+    public ChartType Type { get; set; }
 
     [Parameter]
     public string[] Data { get; set; }

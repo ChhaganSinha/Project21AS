@@ -1,13 +1,9 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using Project21AS.Client.Shared.ChartJs
+@inject IJSRuntime JSRuntime
 
 <canvas id="@Id"></canvas>
 
 @code {
-    public enum ChartType
-    {
-        Pie,
-        Bar
-    }
 
     [Parameter]
     public string Id { get; set; }
