@@ -230,6 +230,11 @@ body.dark .sidebar header .toggle {
     font-size: 15px;
 }
 
+.sub-menu li {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
     .sidebar li a:hover {
         background-color: var(--primary-color);
     }
