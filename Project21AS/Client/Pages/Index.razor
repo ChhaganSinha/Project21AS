@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Project21AS.Client.Client
+@using Project21AS.Client.Shared.ChartJs
 @inject AppClient client
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -58,6 +59,38 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fa fa-chart-bar me-1"></i>
+                    Dashboard Statistics
+                </div>
+                <div class="card-body">
+                     <Chart Id="companybar" Type="@AssetManagement.Dto.Dashboard.ChartType.bar"
+                                           Datasets="@CompanyStatics"
+                                           Labels="@CompanyStaticsLabels"
+                                           AspectRatio="false"
+                                           IndexAxis="y"
+                                           borderRadius="0"
+                                           IsStacked="false">
+                                    </Chart>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fa fa-chart-bar me-1"></i>
+                    Dashboard Statistics
+                </div>
+                <div class="card-body">
+                    <p>Statistics will be displayed here.</p>
+                </div>
+            </div>
+        </div>
+        </div>
 </div>
 
 @code{
@@ -73,5 +106,32 @@
         TotalStudents = data.TotalStudent;
     }
 
+    #region Company
+    CompanyStaticsLabels = masterStatics.CompaniesStatics.Where(c => c.CompanyCode == CompanyCode).Select(o => o.CompanyCode).ToArray();
+
+    CompanyStatics.Add(new ChartJsDataset
+                {
+                    Label = "TotalAssets",
+                    Data = masterStatics.CompaniesStatics.Where(c => c.CompanyCode == CompanyCode).Select(o => o.TotalAssets.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors("#ffb1c1", masterStatics.CompaniesStatics.Count()),
+
+                });
+
+CompanyStatics.Add(new ChartJsDataset
+{
+    Label = "TotalEmployees",
+    Data = masterStatics.CompaniesStatics.Where(c => c.CompanyCode == CompanyCode).Select(o => o.TotalEmployees.ToString()).ToArray(),
+    BackgroundColor = ColorHelper.GetBackgroundColors("#9ad0f5", masterStatics.CompaniesStatics.Count()),
+
+});
+
+CompanyStatics.Add(new ChartJsDataset
+{
+    Label = "TotalAllocations",
+    Data = masterStatics.CompaniesStatics.Where(c => c.CompanyCode == CompanyCode).Select(o => o.TotalAllocations.ToString()).ToArray(),
+    BackgroundColor = ColorHelper.GetBackgroundColors("#b5e48c", masterStatics.CompaniesStatics.Count()),
+
+});
+            #endregion
     
 }                    
