@@ -1,4 +1,4 @@
-﻿@using Project21AS.Client.States
+﻿﻿@using Project21AS.Client.States
 @inject IJSRuntime JSRuntime
 @inject NavigationManager navigationManager
 @inject IdentityAuthenticationStateProvider authStateProvider
@@ -50,7 +50,14 @@
                     </a>
                 </li>
 
-                <li id="driverMenu" class="submenu @(driverMenuOpen ? "active" : "")">
+                <li class="">
+                    <a href="Downloads/MF220U_Driver.zip">
+                        <i class="bx bx-download icon" aria-hidden="true" title="Downloads"></i>
+                        <span class="text nav-text">Drivers</span>
+                    </a>
+                </li>
+
+               @*  <li class="submenu @(driverMenuOpen ? "active" : "")">
                     <div class="menu-link" @onclick="toggleDriverMenu">
                         <i class='bx bx-download icon' title="Download"></i>
                         <span class="text nav-text">Drivers</span>
@@ -58,14 +65,19 @@
                     </div>
                     <ul class="sub-menu @(driverMenuOpen ? "show" : "")">
                         <li>
-                            <a href="Downloads/Mantra_MSF100_Drivers.zip" class="text nav-text">MSF100</a>
+                            <a href="Downloads/Mantra_MSF100_Drivers.zip">
+                                <i class='bx bx-file-blank icon'></i>
+                                <span class="text nav-text">MSF100</span>
+                            </a>
                         </li>
                         <li>
-                            <a href="Downloads/MF220U_Drivers.zip" class="text nav-text">MF220U</a>
+                            <a href="Downloads/MF220U_Drivers.zip">
+                                <i class='bx bx-file-blank icon'></i>
+                                <span class="text nav-text">MF220U</span>
+                            </a>
                         </li>
                     </ul>
-                </li>
-
+                </li> *@
 
                 <AuthorizeView Roles="SuperAdmin,Admin">
                     <li class="">
@@ -88,8 +100,8 @@
 
             <li class="mode">
                 <div class="sun-moon">
+                    <i class='bx bx-sun icon sub'></i>
                     <i class='bx bx-moon icon moon'></i>
-                    <i class='bx bx-sun icon sun'></i>
                 </div>
                 <span class="mode-text text">Dark mode</span>
 
@@ -101,11 +113,195 @@
     </div>
 </nav>
 
+<style>
+    /* Clean Submenu Styles - Matches your existing design */
+
+    /* Submenu container */
+    .sidebar .submenu {
+        position: relative;
+    }
+
+        /* Menu link for submenu toggle - matches your existing li a styles */
+        .sidebar .submenu .menu-link {
+            list-style: none;
+            height: 100%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 50px;
+            width: 100%;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--tran-03);
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+            .sidebar .submenu .menu-link:hover {
+                background-color: var(--primary-color);
+            }
+
+                .sidebar .submenu .menu-link:hover .icon,
+                .sidebar .submenu .menu-link:hover .text,
+                .sidebar .submenu .menu-link:hover .arrow {
+                    color: var(--sidebar-color);
+                }
+
+    body.dark .sidebar .submenu .menu-link:hover .icon,
+    body.dark .sidebar .submenu .menu-link:hover .text,
+    body.dark .sidebar .submenu .menu-link:hover .arrow {
+        color: var(--text-color);
+    }
+
+    /* Arrow icon */
+    .sidebar .submenu .arrow {
+        font-size: 12px;
+        transition: transform var(--tran-03);
+        color: var(--text-color);
+        position: absolute;
+        right: 20px;
+    }
+
+        .sidebar .submenu .arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+    /* Sub menu styles - clean and minimal */
+    .sidebar .sub-menu {
+        display: none;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-top: 5px;
+    }
+
+        .sidebar .sub-menu.show {
+            display: block;
+        }
+
+        .sidebar .sub-menu li {
+            height: 45px;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            padding-left: 35px;
+        }
+
+            .sidebar .sub-menu li a {
+                list-style: none;
+                height: 100%;
+                background-color: transparent;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                border-radius: 6px;
+                text-decoration: none;
+                transition: var(--tran-03);
+                color: var(--text-color);
+            }
+
+                .sidebar .sub-menu li a:hover {
+                    background-color: var(--primary-color);
+                }
+
+                    .sidebar .sub-menu li a:hover .icon,
+                    .sidebar .sub-menu li a:hover .text {
+                        color: var(--sidebar-color);
+                    }
+
+    body.dark .sidebar .sub-menu li a:hover .icon,
+    body.dark .sidebar .sub-menu li a:hover .text {
+        color: var(--text-color);
+    }
+
+    .sidebar .sub-menu li a .icon {
+        min-width: 60px;
+        border-radius: 6px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .sidebar .sub-menu li a .text {
+        font-size: 15px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 1;
+    }
+
+    /* When sidebar is closed - hide submenu items text */
+    .sidebar.close .sub-menu li a .text {
+        opacity: 0;
+    }
+
+    .sidebar.close .submenu .arrow {
+        opacity: 0;
+    }
+
+    /* Closed sidebar submenu positioning - popup style */
+    .sidebar.close .submenu:hover .sub-menu {
+        display: block;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        min-width: 200px;
+        background: var(--sidebar-color);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 6px;
+        z-index: 1000;
+        padding: 8px 0;
+    }
+
+        .sidebar.close .submenu:hover .sub-menu li {
+            padding-left: 0;
+            margin: 0;
+        }
+
+            .sidebar.close .submenu:hover .sub-menu li a .text {
+                opacity: 1;
+            }
+
+    /* Tooltip for closed sidebar */
+    .sidebar.close .submenu:hover::after {
+        content: "Drivers";
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 999;
+        margin-left: 8px;
+        pointer-events: none;
+    }
+
+    /* Responsive behavior */
+    @@media (max-width: 768px) {
+        .sidebar.close .submenu:hover .sub-menu {
+            position: relative;
+            left: 0;
+            box-shadow: none;
+            background: transparent;
+            padding: 0;
+        }
+
+            .sidebar.close .submenu:hover .sub-menu li {
+                padding-left: 35px;
+            }
+    }
+</style>
 
 @code {
     private bool sidebarClosed = true;
     private bool driverMenuOpen = false;
-    private bool settingsMenuOpen = false;
 
     async Task LogoutClick()
     {
@@ -123,14 +319,7 @@
     async Task toggleDriverMenu()
     {
         driverMenuOpen = !driverMenuOpen;
-        await JSRuntime.InvokeVoidAsync("toggleSubMenu", "driverMenu");
-        StateHasChanged();
-    }
-
-    async Task toggleSettingsMenu()
-    {
-        settingsMenuOpen = !settingsMenuOpen;
-        await JSRuntime.InvokeVoidAsync("toggleSubMenu", "settingsMenu");
+        await JSRuntime.InvokeVoidAsync("toggleDriverMenu");
         StateHasChanged();
     }
 
