@@ -233,6 +233,7 @@ body.dark .sidebar header .toggle {
 .sub-menu li {
     list-style-type: disc;
     padding-left: 20px;
+    display: list-item;
 }
 
     .sidebar li a:hover {
