@@ -71,27 +71,7 @@
                         </li>
                     </ul>
                 </li>
-                <li id="settingsMenu" class="submenu @(settingsMenuOpen ? "active" : "")">
-                    <div class="menu-link" @onclick="toggleSettingsMenu">
-                        <i class="fa fa-cogs icon" style="color:#c447e3;"></i>
-                        <span class="text nav-text">Settings</span>
-                        <i class='bx bx-chevron-down arrow @(settingsMenuOpen ? "rotated" : "")'></i>
-                    </div>
-                    <ul class="sub-menu @(settingsMenuOpen ? "show" : "")">
-                        <li>
-                            <a href="gernral-settings">
-                                <i class='bx bx-file-blank icon'></i>
-                                <span class="text nav-text">General</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="Security-settings">
-                                <i class='bx bx-file-blank icon'></i>
-                                <span class="text nav-text">Security</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+               
 
                 <AuthorizeView Roles="SuperAdmin,Admin">
                     <li class="">
