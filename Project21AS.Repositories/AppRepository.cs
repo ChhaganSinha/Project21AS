@@ -18,10 +18,12 @@ namespace Project21AS.Repositories
     public class AppRepository : BaseRepository, IAppRepository
     {
         public AppDbContext AppDbCxt { get; set; }
+        public AuthDbContext AuthDbCxt { get; set; }
 
-        public AppRepository(ILogger<AppRepository> logger, AppDbContext appContext) : base(logger)
+        public AppRepository(ILogger<AppRepository> logger, AppDbContext appContext, AuthDbContext authDbContext) : base(logger)
         {
             AppDbCxt = appContext;
+            AuthDbCxt = authDbContext;
         }
 
         #region Details
@@ -509,15 +511,43 @@ namespace Project21AS.Repositories
         public async Task<Dashboard> GetDashboardStatistics(string _userName)
         {
             Dashboard dashboard = new Dashboard();
+
             if (!string.Equals(_userName, "Admin", StringComparison.OrdinalIgnoreCase))
             {
                 dashboard.TotalBatches = await AppDbCxt.Batch.Where(x => x.Admin == _userName).CountAsync();
                 dashboard.TotalStudent = await AppDbCxt.Student.Where(x => x.Admin == _userName).CountAsync();
+                dashboard.TotalUsers = await AuthDbCxt.Users.CountAsync();
+
+                var allowed = await AuthDbCxt.Users
+                    .Where(u => u.UserName == _userName)
+                    .Select(u => u.AllowedBatches)
+                    .FirstOrDefaultAsync();
+                dashboard.RemainingBatches = Math.Max(0, allowed - dashboard.TotalBatches);
+
+                dashboard.StudentsByBatch = await AppDbCxt.Student
+                    .Where(x => x.Admin == _userName)
+                    .GroupBy(x => x.Batch)
+                    .Select(g => new BatchStudentCount
+                    {
+                        BatchName = g.Key,
+                        StudentCount = g.Count()
+                    }).ToListAsync();
             }
             else
             {
                 dashboard.TotalBatches = await AppDbCxt.Batch.CountAsync();
                 dashboard.TotalStudent = await AppDbCxt.Student.CountAsync();
+                dashboard.TotalUsers = await AuthDbCxt.Users.CountAsync();
+
+                dashboard.RemainingBatches = 0;
+
+                dashboard.StudentsByBatch = await AppDbCxt.Student
+                    .GroupBy(x => x.Batch)
+                    .Select(g => new BatchStudentCount
+                    {
+                        BatchName = g.Key,
+                        StudentCount = g.Count()
+                    }).ToListAsync();
             }
 
             return dashboard;

@@ -11,5 +11,7 @@ namespace Project21AS.Dto.Dashboard
         public int TotalBatches { get; set; }
         public int RemainingBatches { get; set; }
         public int TotalStudent { get; set; }
+        public int TotalUsers { get; set; }
+        public List<BatchStudentCount> StudentsByBatch { get; set; } = new();
     }
 }
