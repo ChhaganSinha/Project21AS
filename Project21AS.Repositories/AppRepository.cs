@@ -102,7 +102,7 @@ namespace Project21AS.Repositories
             {
                 if (Student == null)
                     throw new ArgumentNullException("Invalid Student data");
-                int StudentCountForBatch = await AppDbCxt.Student.Where(o=>o.Batch == Student.Batch && o.Admin == Student.Admin).CountAsync();
+                int StudentCountForBatch = await AppDbCxt.Student.Where(o => o.Batch == Student.Batch && o.Admin == Student.Admin).CountAsync();
                 if (StudentCountForBatch >= Student.MaxStudentPerBatch)
                 {
                     result.IsSuccess = false;
@@ -136,8 +136,8 @@ namespace Project21AS.Repositories
             var result = new ApiResponse<StudentBatchTransfer>();
             try
             {
-                var data =  AppDbCxt.Student.Where(o=>o.Id == Student.Id).FirstOrDefault();
-                if(data != null)
+                var data = AppDbCxt.Student.Where(o => o.Id == Student.Id).FirstOrDefault();
+                if (data != null)
                 {
                     string batch = Student.NewBatch.Split("+")[0];
                     string admin = Student.NewBatch.Split("+")[1];
@@ -158,7 +158,7 @@ namespace Project21AS.Repositories
                     result.Message = "Student Not Found in Database!";
                     return result;
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -169,7 +169,7 @@ namespace Project21AS.Repositories
         }
 
 
-        public async Task<(bool, string)> DeleteStudentById(int id,string path)
+        public async Task<(bool, string)> DeleteStudentById(int id, string path)
         {
             Student result = await AppDbCxt.Student.FindAsync(id);
 
@@ -177,7 +177,7 @@ namespace Project21AS.Repositories
             {
                 try
                 {
-                    
+
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -223,7 +223,7 @@ namespace Project21AS.Repositories
 
                     // Delete the student from the database
                     AppDbCxt.Student.Remove(result);
-                    if(studentFingerMapping != null)
+                    if (studentFingerMapping != null)
                         AppDbCxt.StudentFingerPrintMapping.Remove(studentFingerMapping);
 
                     await AppDbCxt.SaveChangesAsync();
@@ -243,61 +243,69 @@ namespace Project21AS.Repositories
         public async Task<ApiResponse<StudentFingerPrintMapping>> UpsertStudentFingerPrint(StudentFingerPrintMapping data)
         {
             var result = new ApiResponse<StudentFingerPrintMapping>();
-
-            var existingData = await AppDbCxt.StudentFingerPrintMapping.FirstOrDefaultAsync(e => e.Id == data.Id);
-
-            if (existingData != null)
+            try
             {
-                if (!string.IsNullOrEmpty(data.FingerPrint1))
-                {
-                    existingData.FingerPrint1 = data.FingerPrint1;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint2))
-                {
-                    existingData.FingerPrint2 = data.FingerPrint2;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint3))
-                {
-                    existingData.FingerPrint3 = data.FingerPrint3;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint4))
-                {
-                    existingData.FingerPrint4 = data.FingerPrint4;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint5))
-                {
-                    existingData.FingerPrint5 = data.FingerPrint5;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint6))
-                {
-                    existingData.FingerPrint6 = data.FingerPrint6;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint7))
-                {
-                    existingData.FingerPrint7 = data.FingerPrint7;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint8))
-                {
-                    existingData.FingerPrint8 = data.FingerPrint8;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint9))
-                {
-                    existingData.FingerPrint9 = data.FingerPrint9;
-                }
-                if (!string.IsNullOrEmpty(data.FingerPrint10))
-                {
-                    existingData.FingerPrint10 = data.FingerPrint10;
-                }
-                // Update the database
-                AppDbCxt.StudentFingerPrintMapping.Update(existingData);
-            }
-            else
-            {
-                // Add new data to the database
-                AppDbCxt.StudentFingerPrintMapping.Add(data);
-            }
+                var existingData = await AppDbCxt.StudentFingerPrintMapping.FirstOrDefaultAsync(e => e.Id == data.Id);
 
-            await AppDbCxt.SaveChangesAsync();
+                if (existingData != null)
+                {
+                    if (!string.IsNullOrEmpty(data.FingerPrint1))
+                    {
+                        existingData.FingerPrint1 = data.FingerPrint1;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint2))
+                    {
+                        existingData.FingerPrint2 = data.FingerPrint2;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint3))
+                    {
+                        existingData.FingerPrint3 = data.FingerPrint3;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint4))
+                    {
+                        existingData.FingerPrint4 = data.FingerPrint4;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint5))
+                    {
+                        existingData.FingerPrint5 = data.FingerPrint5;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint6))
+                    {
+                        existingData.FingerPrint6 = data.FingerPrint6;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint7))
+                    {
+                        existingData.FingerPrint7 = data.FingerPrint7;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint8))
+                    {
+                        existingData.FingerPrint8 = data.FingerPrint8;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint9))
+                    {
+                        existingData.FingerPrint9 = data.FingerPrint9;
+                    }
+                    if (!string.IsNullOrEmpty(data.FingerPrint10))
+                    {
+                        existingData.FingerPrint10 = data.FingerPrint10;
+                    }
+                    // Update the database
+                    AppDbCxt.StudentFingerPrintMapping.Update(existingData);
+                }
+                else
+                {
+                    // Add new data to the database
+                    AppDbCxt.StudentFingerPrintMapping.Add(data);
+                }
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
             return result;
         }
 
@@ -331,7 +339,7 @@ namespace Project21AS.Repositories
             IEnumerable<Student> result = new List<Student>();
 
             result = AppDbCxt.Student.Where(x => x.Admin == batch.Admin && x.Batch == batch.Name).ToList();
-      
+
             return result;
         }
         #endregion
@@ -393,7 +401,7 @@ namespace Project21AS.Repositories
                         var studentsToUpdate = await AppDbCxt.Student.Where(x => x.Batch == existingBatch.Name && x.Admin == existingBatch.Admin).ToListAsync();
                         foreach (var student in studentsToUpdate)
                         {
-                            student.Batch = batch.Name;                           
+                            student.Batch = batch.Name;
                             student.ModifiedOn = DateTime.Now;
                             AppDbCxt.Student.Update(student);
                         }
@@ -426,7 +434,7 @@ namespace Project21AS.Repositories
 
 
 
-        public async Task<(bool, string)> DeleteBatchById(int id,string path)
+        public async Task<(bool, string)> DeleteBatchById(int id, string path)
         {
             Batch result = await AppDbCxt.Batch.FindAsync(id);
 

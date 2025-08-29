@@ -38,7 +38,7 @@ else
 
     Action<IGridColumnCollection<Student>> columns = c =>
     {
-        // c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Titled("SN.").Filterable(filter);
+        //c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Batch).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Mobile).Css("table-bordered").Filterable(filter);
@@ -50,8 +50,8 @@ else
             {
                 imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint1.Replace(".txt", ".png")}";
             }
-            return $"<img src='{imageUrl}' alt='FingerPrint1' width='50' height='50' />";
-        }).SetWidth("5px").Css("table-bordered").Titled("Finger1");
+            return $"<img src='{imageUrl}' alt='Fin1' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin1");
 
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
         {
@@ -61,8 +61,8 @@ else
             {
                 imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint2.Replace(".txt", ".png")}";
             }
-            return $"<img src='{imageUrl}' alt='FingerPrint2' width='50' height='50' />";
-        }).SetWidth("5px").Css("table-bordered").Titled("Finger2");
+            return $"<img src='{imageUrl}' alt='Fin2' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin2");
 
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
         {
@@ -72,8 +72,8 @@ else
             {
                 imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint3.Replace(".txt", ".png")}";
             }
-            return $"<img src='{imageUrl}' alt='FingerPrint3' width='50' height='50' />";
-        }).SetWidth("5px").Css("table-bordered").Titled("Finger3");
+            return $"<img src='{imageUrl}' alt='Fin3' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin3");
 
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
         {
@@ -83,8 +83,8 @@ else
             {
                 imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint4.Replace(".txt", ".png")}";
             }
-            return $"<img src='{imageUrl}' alt='FingerPrint4' width='50' height='50' />";
-        }).SetWidth("5px").Css("table-bordered").Titled("Finger4");
+            return $"<img src='{imageUrl}' alt='Fin4' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin4");
 
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
         {
@@ -94,63 +94,63 @@ else
             {
                 imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint5.Replace(".txt", ".png")}";
             }
-            return $"<img src='{imageUrl}' alt='FingerPrint5' width='50' height='50' />";
-        }).SetWidth("5px").Css("table-bordered").Titled("Finger5");
+            return $"<img src='{imageUrl}' alt='Fin5' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin5");
 
-        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
-        // {
-        //     var imageUrl = "/Image/fingerprint-Icon.png";
-        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-        //     if (file != null && file.FingerPrint6 != "")
-        //     {
-        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint6.Replace(".txt", ".png")}";
-        //     }
-        //     return $"<img src='{imageUrl}' alt='FingerPrint6' width='50' height='50' />";
-        // }).SetWidth("5px").Css("table-bordered").Titled("Finger6");
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint6 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint6.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='Fin6' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin6");
 
-        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
-        // {
-        //     var imageUrl = "/Image/fingerprint-Icon.png";
-        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-        //     if (file != null && file.FingerPrint7 != "")
-        //     {
-        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint7.Replace(".txt", ".png")}";
-        //     }
-        //     return $"<img src='{imageUrl}' alt='FingerPrint7' width='50' height='50' />";
-        // }).SetWidth("5px").Css("table-bordered").Titled("Finger7");
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint7 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint7.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='Fing7' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin7");
 
-        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
-        // {
-        //     var imageUrl = "/Image/fingerprint-Icon.png";
-        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-        //     if (file != null && file.FingerPrint8 != "")
-        //     {
-        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint8.Replace(".txt", ".png")}";
-        //     }
-        //     return $"<img src='{imageUrl}' alt='FingerPrint8' width='50' height='50' />";
-        // }).SetWidth("5px").Css("table-bordered").Titled("Finger8");
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint8 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint8.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='Fin8' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin8");
 
-        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
-        // {
-        //     var imageUrl = "/Image/fingerprint-Icon.png";
-        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-        //     if (file != null && file.FingerPrint9 != "")
-        //     {
-        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint9.Replace(".txt", ".png")}";
-        //     }
-        //     return $"<img src='{imageUrl}' alt='FingerPrint9' width='50' height='50' />";
-        // }).SetWidth("5px").Css("table-bordered").Titled("Finger9");
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint9 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint9.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='Fin9' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin9");
 
-        // c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
-        // {
-        //     var imageUrl = "/Image/fingerprint-Icon.png";
-        //     var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-        //     if (file != null && file.FingerPrint10 != "")
-        //     {
-        //         imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint10.Replace(".txt", ".png")}";
-        //     }
-        //     return $"<img src='{imageUrl}' alt='FingerPrint10' width='50' height='50' />";
-        // }).SetWidth("5px").Css("table-bordered").Titled("Finger10");
+        c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
+        {
+            var imageUrl = "/Image/fingerprint-Icon.png";
+            var file = studentFingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+            if (file != null && file.FingerPrint10 != "")
+            {
+                imageUrl = $"{BaseUri}StudentZone/{file.FingerPrint10.Replace(".txt", ".png")}";
+            }
+            return $"<img src='{imageUrl}' alt='Fin10' width='50' height='50' />";
+        }).SetWidth("5px").Css("table-bordered").Titled("Fin10");
 
         //c.Add(o => o.CreatedOn).Css("table-bordered").Format("{0:dd/MM/yyyy}").Filterable(filter);
         // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<StudentViewButton>().SetWidth("50px").Titled("View");

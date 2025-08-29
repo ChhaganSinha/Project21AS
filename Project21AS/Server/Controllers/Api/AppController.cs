@@ -179,21 +179,19 @@ namespace Project21AS.Server.Controllers.Api
             return await _appRepository.GetStudentsByBatchName(batch);
         }
 
-
         [HttpPost]
         [Route("printPDF")]
-        public async Task<IActionResult> PrintPDF(Batch batch) // Make the method asynchronous
+        public async Task<IActionResult> PrintPDF(Batch batch)
         {
             try
             {
-                //var BaseUri = new Uri($"{Request.Scheme}://{Request.Host}/");
                 var BaseUri = _configuration["BaseUrl"];
 
                 string studentZonePath;
 #if DEBUG
                 studentZonePath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "\\Project21AS\\Client\\wwwroot\\StudentZone";
 #else
-                studentZonePath = Path.Combine(_env.ContentRootPath, "wwwroot", "StudentZone");
+        studentZonePath = Path.Combine(_env.ContentRootPath, "wwwroot", "StudentZone");
 #endif
 
                 var studentListTask = GetStudentsByBatchName(batch);
@@ -204,115 +202,102 @@ namespace Project21AS.Server.Controllers.Api
                 var studentList = studentListTask.Result;
                 var fingerPrintMapping = fingerPrintMappingTask.Result;
 
-                // Create a temporary file path
+                // Temporary file path
                 var filePath = Path.Combine(Path.GetTempPath(), $"example_{Guid.NewGuid()}.pdf");
 
-                // Create a PdfWriter object
                 using (var writer = new PdfWriter(filePath))
+                using (var pdf = new PdfDocument(writer))
+                using (var document = new Document(pdf))
                 {
-                    // Create a PdfDocument object
-                    using (var pdf = new PdfDocument(writer))
+                    // Header
+                    Paragraph header = new Paragraph()
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .Add($"Batch Admin: {batch.Admin}  |  Batch: {batch.Name}  |  Date: {DateTime.Today.ToShortDateString()}");
+                    header.SetFontColor(ColorConstants.BLUE);
+                    document.Add(header);
+
+                    float fontSize = 8;
+
+                    // Define 14 columns: Name, Mobile, Batch, Address, Finger1-10
+                    float[] columnWidths = { 2, 2, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+                    Table table = new Table(UnitValue.CreatePercentArray(columnWidths)).UseAllAvailableWidth();
+
+                    // Table header
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Name").SetFontSize(fontSize)));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Mobile").SetFontSize(fontSize)));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Batch").SetFontSize(fontSize)));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Address").SetFontSize(fontSize)));
+                    for (int i = 1; i <= 10; i++)
                     {
-                        // Create a Document object
-                        using (var document = new Document(pdf))
+                        table.AddHeaderCell(new Cell().Add(new Paragraph($"Finger{i}").SetFontSize(fontSize)));
+                    }
+
+                    // Table data
+                    foreach (var student in studentList)
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(student.Name).SetFontSize(fontSize)));
+                        table.AddCell(new Cell().Add(new Paragraph(student.Mobile).SetFontSize(fontSize)));
+                        table.AddCell(new Cell().Add(new Paragraph(student.Batch ?? "").SetFontSize(fontSize)));
+                        table.AddCell(new Cell().Add(new Paragraph(student.Address).SetFontSize(fontSize)));
+
+                        var studentFingerPrints = fingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
+                        if (studentFingerPrints != null)
                         {
-                            // Add header with admin name, batch name, and today's date
-                            Paragraph header = new Paragraph()
-                                .SetTextAlignment(TextAlignment.CENTER)
-                                .Add($"Batch Admin: {batch.Admin}  |  Batch: {batch.Name}  |  Date: {DateTime.Today.ToShortDateString()}");
-                            header.SetFontColor(ColorConstants.BLUE);
-                            document.Add(header);
-
-                            // Create a table with 9 columns
-                            Table table = new Table(9);
-
-                            // Set font for table cells
-                            float fontSize = 8;
-
-
-                            // Add table header
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Name").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Mobile").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Batch").SetFontSize(8)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Address").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Finger1").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Finger2").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Finger3").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Finger4").SetFontSize(fontSize)));
-                            table.AddHeaderCell(new Cell().Add(new Paragraph("Finger5").SetFontSize(fontSize)));
-
-                            // Add table data
-                            foreach (var student in studentList)
+                            for (int i = 1; i <= 10; i++)
                             {
-                                table.AddCell(new Cell().Add(new Paragraph(student.Name).SetFontSize(fontSize)));
-                                table.AddCell(new Cell().Add(new Paragraph(student.Mobile).SetFontSize(fontSize)));
-                                table.AddCell(new Cell().Add(new Paragraph(student.Batch ?? "").SetFontSize(fontSize))); // Handle null Batch
-                                table.AddCell(new Cell().Add(new Paragraph(student.Address).SetFontSize(fontSize)));
-
-                                // Add finger image cells
-                                var studentFingerPrints = fingerPrintMapping.FirstOrDefault(o => o.Id == student.Id);
-                                if (studentFingerPrints != null)
+                                string fingerPrintFileName = $"FingerPrint{i}";
+                                var value = studentFingerPrints.GetType().GetProperty(fingerPrintFileName)?.GetValue(studentFingerPrints)?.ToString();
+                                if (!string.IsNullOrWhiteSpace(value))
                                 {
-                                    // Iterate through each finger print
-                                    for (int i = 1; i <= 5; i++)
+                                    var imagePath = Path.Combine(studentZonePath, value.Replace(".txt", ".png"));
+                                    if (System.IO.File.Exists(imagePath))
                                     {
-                                        string fingerPrintFileName = $"FingerPrint{i}";
-                                        var value = studentFingerPrints.GetType().GetProperty(fingerPrintFileName)?.GetValue(studentFingerPrints)?.ToString();
-                                        if (!string.IsNullOrWhiteSpace(value))
+                                        try
                                         {
-                                            var imagePath = Path.Combine(studentZonePath, value.Replace(".txt", ".png"));
-                                            if (System.IO.File.Exists(imagePath))
-                                            {
-                                                try
-                                                {
-                                                    ImageData imageData = ImageDataFactory.Create(imagePath);
-                                                    Image image = new Image(imageData);
-                                                    image.SetWidth(40f);
-                                                    image.SetHeight(40f);
-                                                    table.AddCell(new Cell().Add(image));
-                                                }
-                                                catch
-                                                {
-                                                    table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
-                                                }
-                                            }
-                                            else
-                                            {
-                                                table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
-                                            }
+                                            ImageData imageData = ImageDataFactory.Create(imagePath);
+                                            Image image = new Image(imageData);
+                                            image.SetAutoScale(true);   // Auto fit inside cell
+                                            table.AddCell(new Cell().Add(image));
                                         }
-                                        else
+                                        catch
                                         {
-                                            table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
+                                            table.AddCell(new Cell().Add(new Paragraph("")));
                                         }
+                                    }
+                                    else
+                                    {
+                                        table.AddCell(new Cell().Add(new Paragraph("")));
                                     }
                                 }
                                 else
                                 {
-                                    // Add empty cells if no finger prints are found
-                                    for (int i = 0; i < 5; i++)
-                                    {
-                                        table.AddCell(new Cell().Add(new Paragraph("").SetFontSize(fontSize)));
-                                    }
+                                    table.AddCell(new Cell().Add(new Paragraph("")));
                                 }
                             }
-
-                            // Add the table to the document
-                            document.Add(table);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 10; i++)
+                            {
+                                table.AddCell(new Cell().Add(new Paragraph("")));
+                            }
                         }
                     }
+
+                    // Add table
+                    document.Add(table);
                 }
 
-                // Return the PDF file for download
+                // Return file
                 byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
                 return File(fileBytes, "application/pdf", "example.pdf");
             }
             catch (Exception ex)
             {
-                // Handle any errors
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
 
 
         #endregion
