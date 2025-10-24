@@ -41,7 +41,7 @@ else
         // c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Batch).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.Mobile).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Mobile).Titled("Candidate ID").Css("table-bordered").Filterable(filter);
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
         {
             var imageUrl = "/Image/fingerprint-Icon.png";

@@ -65,7 +65,7 @@ else
     {
         c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Batch).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.Mobile).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Mobile).Titled("Candidate ID").Css("table-bordered").Filterable(filter);
         //c.Add(o => o.CreatedOn).Css("table-bordered").Format("{0:dd/MM/yyyy}").Filterable(filter);
         c.Add().Encoded(false).Sanitized(false).RenderValueAs(student =>
        {
