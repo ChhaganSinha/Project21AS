@@ -12,12 +12,12 @@ namespace Project21AS.Dto
     {
         public string Admin { get; set; } = string.Empty;
         [Required]
-        public string Name { get; set; } = string.Empty; 
+        public string Name { get; set; } = string.Empty;
         [Required]
         public string Mobile { get; set; } = string.Empty;
-        [Required]
         public string ? Batch { get; set; } 
         [Required]
+        [RegularExpression(@"^\d{12}$", ErrorMessage = "Invalid Aadhar Number")]
         public string Address { get; set; } = string.Empty;
         
         [NotMapped]
